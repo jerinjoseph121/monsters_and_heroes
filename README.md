@@ -1,5 +1,7 @@
 # CS 611 – Monsters and Heroes
 
+### Jerin Joseph - U11191999
+
 Turn-based, tile-based RPG inspired by classic party dungeon crawlers.  
 The player controls a **party of heroes** moving together on a map, visiting **markets**, and fighting **monsters** in **turn-based battles**.
 
