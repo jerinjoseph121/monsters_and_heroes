@@ -414,495 +414,486 @@ Below is a **high-level UML** diagram (Mermaid syntax) showing the main classes 
 
 ```mermaid
 classDiagram
-    direction LR
-
-    class Character {
-      -int id
-      -String name
-      -int level
-      -double HP
-      -CharacterType type
-      +getId()
-      +getName()
-      +getLevel()
-      +getHP()
-      +setHP(double)
+    class Entity {
+        <<abstract>>
+        - name : String
+        - level : int
+        - hp : int
+        + takeDamage(amount : int) : void
+        + isAlive() : boolean
     }
 
     class Hero {
-      -double HP_MAX
-      -double MP
-      -double MP_MAX
-      -double strengthValue
-      -double dexterityValue
-      -double agilityValue
-      -double defenseValue
-      -int totalGold
-      -int experiencePoints
-      -HeroType heroType
-      -Inventory inventory
-      -Weapon equippedWeapon
-      -Armor equippedArmor
-      +levelUp()
-      +getInventory()
+        - strength : int
+        - dexterity : int
+        - agility : int
+        - mana : int
+        - money : int
+        - experience : int
+        + attack(target : Monster) : void
+        + castSpell(spell : Spell, target : Monster) : void
+        + usePotion(potion : Potion) : void
+        + equipWeapon(weapon : Weapon) : void
+        + equipArmor(armor : Armor) : void
+        + levelUp() : void
     }
 
     class Monster {
-      -double baseDamageValue
-      -double defenseValue
-      -double dodgeAbilityValue
-      -MonsterType monsterType
-      +getBaseDamageValue()
-      +getDefenseValue()
-      +getDodgeAbilityValue()
+        - damage : int
+        - defense : int
+        - dodgeChance : double
+        + attack(target : Hero) : void
+    }
+
+    Entity <|-- Hero
+    Entity <|-- Monster
+    class Warrior
+    class Paladin
+    class Sorcerer
+
+    Hero <|-- Warrior
+    Hero <|-- Paladin
+    Hero <|-- Sorcerer
+    class Dragon
+    class Exoskeleton
+    class Spirit
+
+    Monster <|-- Dragon
+    Monster <|-- Exoskeleton
+    Monster <|-- Spirit
+    class Inventory {
+        - weapons : List~Weapon~
+        - armors : List~Armor~
+        - potions : List~Potion~
+        - spells : List~Spell~
+        + addItem(item : Item) : void
+        + removeItem(item : Item) : void
+        + listItems() : void
     }
 
     class Item {
-      -String name
-      -int price
-      -int level
-      -String itemType
+        <<abstract>>
+        - name : String
+        - price : int
+        - levelReq : int
     }
 
     class Weapon {
-      -int damageValue
-      -int handsRequired
+        - damage : int
+        - hands : int
     }
 
     class Armor {
-      -int damageReduction
-    }
-
-    class Spell {
-      -int damageValue
-      -int manaCost
-      -SpellType spellType
+        - reduction : int
     }
 
     class Potion {
-      -int effectAmountValue
-      -List~AttributeType~ attributes
+        - attributes : String  %% e.g. "Strength_Dexterity_Agility"
+        - effectValue : int
+        + applyTo(hero : Hero) : void
     }
 
-    class Inventory {
-      -List~Weapon~ weapons
-      -List~Armor~ armors
-      -List~Potion~ potions
-      -List~Spell~ spells
-      +addItem(Item)
-      +removeItem(Item)
-      +getWeapons()
-      +getArmors()
-      +getPotions()
-      +getSpells()
+    class Spell {
+        <<abstract>>
+        - baseDamage : int
+        - manaCost : int
+        + cast(caster : Hero, target : Monster) : void
     }
 
-    class Player {
-      -String name
-      -List~Hero~ heroes
-      -Position currentPosition
-      +getHeroes()
-      +getCurrentPosition()
-      +setCurrentPosition(Position)
-    }
-
-    class Position {
-      -int row
-      -int col
-      +getRow()
-      +getCol()
-    }
-
-    class Tile {
-      -MapTileType type
-      -Position position
-      -Market market
-      +getType()
-      +getMarket()
-      +getPosition()
-    }
-
-    class Map {
-      -Tile[][] tiles
-      -double blockProbability
-      -double marketProbability
-      +updatePlayerCurrentPosition(Position)
-      +getPlayerMapTileType(Player)
-      +getMarketAt(Position)
-      +displayMap(Player)
-    }
-
-    class Market {
-      -List~Item~ items
-      +openMarket(Scanner, List~Hero~)
-      +addItem(Item)
-      +removeItem(Item)
-    }
-
-    class Battle {
-      -List~Hero~ heroes
-      -List~Monster~ monsters
-      -Map~Hero,Monster~ rivalMap
-      -Random random
-      +arenaFight() boolean
-      +isBattleTriggered(double) static
-    }
-
-    class Game {
-      -Player player
-      -Map map
-      -double battleProb
-      +launchGame()
-    }
-
-    class Helper {
-      <<utility>>
-      +readIntInRange(Scanner, String, int, int)
-      +readIntInRangeWithDefault(...)
-      +readDoubleInRangeWithDefault(...)
-      +generateId()
-      +showHeroInventory(Hero)
-      +showPlayerInfo(Player)
-    }
-
-    Character <|-- Hero
-    Character <|-- Monster
+    class FireSpell
+    class IceSpell
+    class LightningSpell
 
     Item <|-- Weapon
     Item <|-- Armor
-    Item <|-- Spell
     Item <|-- Potion
+    Item <|-- Spell
 
-    Hero "1" o--> "1" Inventory
-    Inventory "1" o--> "*" Weapon
-    Inventory "1" o--> "*" Armor
-    Inventory "1" o--> "*" Potion
-    Inventory "1" o--> "*" Spell
+    Spell <|-- FireSpell
+    Spell <|-- IceSpell
+    Spell <|-- LightningSpell
+    Hero *-- Inventory
+    Inventory o-- Weapon
+    Inventory o-- Armor
+    Inventory o-- Potion
+    Inventory o-- Spell
+    class Tile {
+        <<abstract>>
+        + isAccessible() : boolean
+        + display() : void
+    }
 
-    Player "1" o--> "*" Hero
-    Player "1" o--> "1" Position
+    class CommonTile {
+        + maybeSpawnMonster() : void
+    }
 
-    Map "1" o--> "*" Tile
-    Tile "1" o--> "0..1" Market
-    Tile "1" o--> "1" Position
+    class MarketTile {
+        - itemsForSale : List~Item~
+        + showMarket() : void
+        + buyItem(hero : Hero, item : Item) : void
+        + sellItem(hero : Hero, item : Item) : void
+    }
 
-    Market "1" o--> "*" Item
+    class InaccessibleTile
 
-    Battle "1" o--> "*" Hero
-    Battle "1" o--> "*" Monster
+    Tile <|-- CommonTile
+    Tile <|-- MarketTile
+    Tile <|-- InaccessibleTile
 
-    Game "1" o--> "1" Player
-    Game "1" o--> "1" Map
-    Game "1" o--> "0..1" Battle
+    class GameMap {
+        - tiles : Tile[][]
+        + printMap() : void
+        + moveHero(direction : char) : void
+        + getCurrentTile() : Tile
+    }
 
-    Helper ..> Hero
-    Helper ..> Player
-    Helper ..> Inventory
-    Battle ..> Inventory
-    Battle ..> Helper
-    Market ..> Helper
+    GameMap "1" o-- "*" Tile
+    class GameController {
+        - map : GameMap
+        - heroes : List~Hero~
+        - monsters : List~Monster~
+        + initializeGame() : void
+        + mainLoop() : void
+        + handleCombat() : void
+        + handleMarket() : void
+    }
+
+    GameController "1" o-- "1" GameMap
+    GameController "1" o-- "*" Hero
+    GameController "1" o-- "*" Monster
+    Hero ..> Weapon : equips
+    Hero ..> Armor : equips
+    Hero ..> Potion : uses
+    Hero ..> Spell : casts
+    Hero ..> GameMap : moves on
+
+    Monster ..> Hero : attacks
+    CommonTile ..> Monster : spawns
+    MarketTile ..> Item : sells/buys
 ```
 
 ## Run Example
 
 Below is a sample output of how the game would look like.
 
-```mermaid
+```bash
     WELCOME TO MONSTERS AND HEROES
 
-    Enter your name: Jerin
-    
-    ========= MAP CONFIGURATIONS =========
-    Enter the dimensions of the world map.
-    Rows: 8
-    Columns: 8
+Enter your name: Jerin Joseph
 
-    Now enter certain configurations for different features in the map
-    Battle Probability [0-1] [Default 0.4]: 0.3
-    Inaccessible Tile Probability [0-1] [Default 0.2]: 0.2
-    Market Probability [0-1] [Default 0.3]: 
-    
-    ========= HERO CONFIGURATIONS =========
-    Select the number of heroes in your party: 1
-    
-    ===== HERO 0 =====
-    Enter the type of hero 0 [Default WARRIOR - 0]: 
-    WARRIOR  - 0
-    SORCERER - 1
-    PALADIN  - 2
-    Your choice (0-2): Choose a warrior type hero:
-    [0] Name: Gaerdal Ironhand | Mana: 100 | Strength: 700 | Agility: 500 | Dexterity: 600 | Starting Money: 1354 | Starting Experience: 7
-    [1] Name: Sehanine Monnbow | Mana: 600 | Strength: 700 | Agility: 800 | Dexterity: 500 | Starting Money: 2500 | Starting Experience: 8
-    [2] Name: Muamman Duathall | Mana: 300 | Strength: 900 | Agility: 500 | Dexterity: 750 | Starting Money: 2546 | Starting Experience: 6
-    [3] Name: Flandal Steelskin | Mana: 200 | Strength: 750 | Agility: 650 | Dexterity: 700 | Starting Money: 2500 | Starting Experience: 7
-    [4] Name: Undefeated Yoj | Mana: 400 | Strength: 800 | Agility: 400 | Dexterity: 700 | Starting Money: 2500 | Starting Experience: 7
-    [5] Name: Eunoia Cyn | Mana: 400 | Strength: 700 | Agility: 800 | Dexterity: 600 | Starting Money: 2500 | Starting Experience: 6
-    Your choice: 0
-    
-    Now finally enter the initial position of the player:
-    Start row [0-7] [Default is 4]: 2
-    Start col [0-7] [Default is 4]: 5
-    
-    =========GAMES STARTED=========
-    =================== WORLD MAP ===================
-    
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  M  |  _  |  _  |  M  |  _  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  _  |  M  |  _  |  _  |  M  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  _  |  M  |  X  |  M  |  P  |  _  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  X  |  M  |  _  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  X  |  X  |  _  |  X  |  _  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  _  |  _  |  _  |  M  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  _  |  X  |  M  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  X  |  _  |  _  |  X  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    Enter a choice:
-    Move [w -> up | a -> left | s -> down | d -> right]: 
-    Show inventory [I]: 
-    Show player stats [P]: 
-    Quit [Q]: 
-    Your choice: w
-    =================== WORLD MAP ===================
-    
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  M  |  _  |  _  |  M  |  _  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  _  |  M  |  P  |  _  |  M  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  _  |  M  |  X  |  M  |  _  |  _  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  X  |  M  |  _  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  X  |  X  |  _  |  X  |  _  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  _  |  _  |  _  |  M  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  _  |  X  |  M  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  X  |  _  |  _  |  X  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    Enter a choice:
-    Move [w -> up | a -> left | s -> down | d -> right]: 
-    Show inventory [I]: 
-    Show player stats [P]: 
-    Quit [Q]: 
-    Your choice: w
-    =================== WORLD MAP ===================
-    
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  M  |  _  |  _  |  M  |  P  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  _  |  M  |  _  |  _  |  M  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  _  |  M  |  X  |  M  |  _  |  _  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  X  |  M  |  _  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  X  |  X  |  _  |  X  |  _  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  _  |  _  |  _  |  M  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  _  |  X  |  M  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  X  |  _  |  _  |  X  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    Enter a choice:
-    Move [w -> up | a -> left | s -> down | d -> right]: 
-    Show inventory [I]: 
-    Show player stats [P]: 
-    Quit [Q]: 
-    Your choice: s
-    =================== WORLD MAP ===================
-    
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  M  |  _  |  _  |  M  |  _  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  _  |  M  |  P  |  _  |  M  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  _  |  M  |  X  |  M  |  _  |  _  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  X  |  M  |  _  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  X  |  X  |  _  |  X  |  _  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  _  |  _  |  _  |  M  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  _  |  X  |  M  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  X  |  _  |  _  |  X  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    Enter a choice:
-    Move [w -> up | a -> left | s -> down | d -> right]: 
-    Show inventory [I]: 
-    Show player stats [P]: 
-    Quit [Q]: 
-    Your choice: s
-    BATTLE STARTS!
-    
-    ===== HEROES =====
-    Gaerdal Ironhand - HP: 100.00/100.00, MP: 100.00/100.00, Level: 1, Gold: 1354, EXP: 7
-    
-    ===== MONSTERS =====
-    Big Bad Wolf - HP: 100.00, Level: 1, Damage: 150.00, Defense: 250.00, Dodge: 15.00
-    
-    Gaerdal Ironhand's turn
-    Choose an action:
-    1 - Attack
-    2 - Cast Spell
-    3 - Use Potion
-    4 - Equip Weapon/Armor
-    5 - Skip
-    Your choice: 1
-    Choose a monster to target:
-    [0] Big Bad Wolf (HP: 100.00)
-    Your choice: 0
-    Gaerdal Ironhand dealt 62.50 damage to Big Bad Wolf.
-    Gaerdal Ironhand dodged the attack!
-    
-    ===== HEROES =====
-    Gaerdal Ironhand - HP: 100.00/100.00, MP: 100.00/100.00, Level: 1, Gold: 1354, EXP: 7
-    
-    ===== MONSTERS =====
-    Big Bad Wolf - HP: 47.50, Level: 1, Damage: 150.00, Defense: 250.00, Dodge: 15.00
-    
-    Gaerdal Ironhand's turn
-    Choose an action:
-    1 - Attack
-    2 - Cast Spell
-    3 - Use Potion
-    4 - Equip Weapon/Armor
-    5 - Skip
-    Your choice: 1
-    Choose a monster to target:
-    [0] Big Bad Wolf (HP: 47.50)
-    Your choice: 0
-    Gaerdal Ironhand dealt 62.50 damage to Big Bad Wolf.
-    All monsters have been defeated. You win!
-    =================== WORLD MAP ===================
-    
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  M  |  _  |  _  |  M  |  _  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  _  |  M  |  _  |  _  |  M  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  _  |  M  |  X  |  M  |  P  |  _  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  X  |  M  |  _  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  X  |  X  |  _  |  X  |  _  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  _  |  _  |  _  |  M  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  _  |  X  |  M  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  X  |  _  |  _  |  X  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    Enter a choice:
-    Move [w -> up | a -> left | s -> down | d -> right]: 
-    Show inventory [I]: 
-    Show player stats [P]: 
-    Quit [Q]: 
-    Your choice: a
-    =================== WORLD MAP ===================
-    
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  M  |  _  |  _  |  M  |  _  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  _  |  M  |  _  |  _  |  M  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  _  |  M  |  X  |  P  |  _  |  _  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  X  |  M  |  _  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  X  |  X  |  _  |  X  |  _  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  _  |  _  |  _  |  M  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  _  |  X  |  M  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  X  |  _  |  _  |  X  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    Enter a choice:
-    Move [w -> up | a -> left | s -> down | d -> right]: 
-    Enter Market [M]: 
-    Show inventory [I]: 
-    Show player stats [P]: 
-    Quit [Q]: 
-    Your choice: m
-    
-    ===== MARKET =====
-    
-    Choose a hero to trade with (or 0 to leave market):
-    [1] Gaerdal Ironhand (Level 1, Gold: 1454)
-    Your choice: 1
-    
-    --- Trading with Gaerdal Ironhand (Level 1, Gold: 1454) ---
-    [1] Buy items
-    [2] Sell items
-    [3] Show hero inventory
-    [4] Back to hero selection
-    Your choice: 1
-    The market is currently out of stock.
-    
-    --- Trading with Gaerdal Ironhand (Level 1, Gold: 1454) ---
-    [1] Buy items
-    [2] Sell items
-    [3] Show hero inventory
-    [4] Back to hero selection
-    Your choice: 2
-    
-    --- Items available to sell ---
-    [1] Sword           | Type: WEAPON     | Sell price:  250 | Level: 1
-    [0] Back
-    Choose item to sell: 1
-    Sold Sword for 250 gold.
-    No more items to sell.
-    
-    --- Trading with Gaerdal Ironhand (Level 1, Gold: 1704) ---
-    [1] Buy items
-    [2] Sell items
-    [3] Show hero inventory
-    [4] Back to hero selection
-    Your choice: 4
-    
-    Choose a hero to trade with (or 0 to leave market):
-    [1] Gaerdal Ironhand (Level 1, Gold: 1704)
-    Your choice: 0
-    Leaving market...
-    =================== WORLD MAP ===================
-    
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  M  |  _  |  _  |  M  |  _  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  _  |  M  |  _  |  _  |  M  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  X  |  _  |  M  |  X  |  P  |  _  |  _  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  X  |  M  |  _  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  X  |  X  |  _  |  X  |  _  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  _  |  _  |  _  |  M  |  _  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  _  |  M  |  _  |  X  |  M  |  X  |  _  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    |  _  |  M  |  _  |  X  |  _  |  _  |  X  |  X  |
-    +=====+=====+=====+=====+=====+=====+=====+=====+
-    Enter a choice:
-    Move [w -> up | a -> left | s -> down | d -> right]: 
-    Enter Market [M]: 
-    Show inventory [I]: 
-    Show player stats [P]: 
-    Quit [Q]: 
-    Your choice: q
-    Game Exited!!
-    
-    Process finished with exit code 0
+========= MAP CONFIGURATIONS =========
+Enter the dimensions of the world map.
+Rows: 8
+Columns: 8
+
+Now enter certain configurations for different features in the map
+Battle Probability [0-1] [Default 0.4]: 
+Inaccessible Tile Probability [0-1] [Default 0.2]: 
+Market Probability [0-1] [Default 0.3]: 
+
+========= HERO CONFIGURATIONS =========
+Select the number of heroes in your party: 1
+
+===== HERO 0 =====
+Enter the type of hero 0 [Default WARRIOR - 0]: 
+WARRIOR  - 0
+SORCERER - 1
+PALADIN  - 2
+Your choice (0-2): 2
+Choose a paladin type hero:
+[0] Name: Parzival | Mana: 300 | Strength: 750 | Agility: 650 | Dexterity: 700 | Starting Money: 2500 | Starting Experience: 7 
+[1] Name: Sehanine Moonbow | Mana: 300 | Strength: 750 | Agility: 700 | Dexterity: 700 | Starting Money: 2500 | Starting Experience: 7 
+[2] Name: Skoraeus Stonebones | Mana: 250 | Strength: 650 | Agility: 600 | Dexterity: 350 | Starting Money: 2500 | Starting Experience: 4 
+[3] Name: Garl Glittergold | Mana: 100 | Strength: 600 | Agility: 500 | Dexterity: 400 | Starting Money: 2500 | Starting Experience: 5 
+[4] Name: Amaryllis Astra | Mana: 500 | Strength: 500 | Agility: 500 | Dexterity: 500 | Starting Money: 2500 | Starting Experience: 5 
+[5] Name: Caliber Heist | Mana: 400 | Strength: 400 | Agility: 400 | Dexterity: 400 | Starting Money: 2500 | Starting Experience: 8 
+Your choice: 4
+
+Now finally enter the initial position of the player:
+Start row [0-7] [Default is 4]: 
+Start col [0-7] [Default is 4]: 
+
+=========GAMES STARTED=========
+=================== WORLD MAP ===================
+
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  X  |  _  |  _  |  _  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  _  |  M  |  M  |  _  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  _  |  M  |  _  |  _  |  _  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  X  |  M  |  _  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  X  |  _  |  X  |  P  |  M  |  M  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  M  |  M  |  M  |  _  |  _  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  _  |  _  |  _  |  M  |  _  |  X  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  _  |  _  |  _  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+Enter a choice:
+Move [w -> up | a -> left | s -> down | d -> right]: 
+Enter Market [M]: 
+Show inventory [I]: 
+Show player stats [P]: 
+Quit [Q]: 
+Your choice: w
+=================== WORLD MAP ===================
+
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  X  |  _  |  _  |  _  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  _  |  M  |  M  |  _  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  _  |  M  |  _  |  _  |  _  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  X  |  M  |  P  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  X  |  _  |  X  |  M  |  M  |  M  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  M  |  M  |  M  |  _  |  _  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  _  |  _  |  _  |  M  |  _  |  X  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  _  |  _  |  _  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+Enter a choice:
+Move [w -> up | a -> left | s -> down | d -> right]: 
+Show inventory [I]: 
+Show player stats [P]: 
+Quit [Q]: 
+Your choice: w
+=================== WORLD MAP ===================
+
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  X  |  _  |  _  |  _  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  _  |  M  |  M  |  _  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  _  |  M  |  P  |  _  |  _  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  X  |  M  |  _  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  X  |  _  |  X  |  M  |  M  |  M  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  M  |  M  |  M  |  _  |  _  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  _  |  _  |  _  |  M  |  _  |  X  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  _  |  _  |  _  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+Enter a choice:
+Move [w -> up | a -> left | s -> down | d -> right]: 
+Show inventory [I]: 
+Show player stats [P]: 
+Quit [Q]: 
+Your choice: w
+=================== WORLD MAP ===================
+
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  X  |  _  |  _  |  _  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  _  |  M  |  M  |  P  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  _  |  M  |  _  |  _  |  _  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  X  |  M  |  _  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  X  |  _  |  X  |  M  |  M  |  M  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  M  |  M  |  M  |  _  |  _  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  _  |  _  |  _  |  M  |  _  |  X  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  _  |  _  |  _  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+Enter a choice:
+Move [w -> up | a -> left | s -> down | d -> right]: 
+Show inventory [I]: 
+Show player stats [P]: 
+Quit [Q]: 
+Your choice: a
+=================== WORLD MAP ===================
+
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  X  |  _  |  _  |  _  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  _  |  M  |  P  |  _  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  _  |  M  |  _  |  _  |  _  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  X  |  M  |  _  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  X  |  _  |  X  |  M  |  M  |  M  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  M  |  M  |  M  |  _  |  _  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  _  |  _  |  _  |  M  |  _  |  X  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  _  |  _  |  _  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+Enter a choice:
+Move [w -> up | a -> left | s -> down | d -> right]: 
+Enter Market [M]: 
+Show inventory [I]: 
+Show player stats [P]: 
+Quit [Q]: 
+Your choice: m
+
+===== MARKET =====
+
+Choose a hero to trade with (or 0 to leave market):
+[1] Amaryllis Astra (Level 1, Gold: 2500)
+Your choice: 1
+
+--- Trading with Amaryllis Astra (Level 1, Gold: 2500) ---
+[1] Buy items
+[2] Sell items
+[3] Show hero inventory
+[4] Back to hero selection
+Your choice: 1
+
+--- Items available to buy ---
+[1] Dagger          | Type: WEAPON     | Price:  200 | Level: 1
+[2] Dagger          | Type: WEAPON     | Price:  200 | Level: 1
+[3] Ambrosia        | Type: POTION     | Price: 1000 | Level: 8
+[4] Frost_Blizzard  | Type: SPELL      | Price:  750 | Level: 5
+[0] Back
+Choose item to buy: 1
+Bought Dagger for 200 gold.
+
+--- Items available to buy ---
+[1] Dagger          | Type: WEAPON     | Price:  200 | Level: 1
+[2] Ambrosia        | Type: POTION     | Price: 1000 | Level: 8
+[3] Frost_Blizzard  | Type: SPELL      | Price:  750 | Level: 5
+[0] Back
+Choose item to buy: 0
+
+--- Trading with Amaryllis Astra (Level 1, Gold: 2300) ---
+[1] Buy items
+[2] Sell items
+[3] Show hero inventory
+[4] Back to hero selection
+Your choice: 4
+
+Choose a hero to trade with (or 0 to leave market):
+[1] Amaryllis Astra (Level 1, Gold: 2300)
+Your choice: 0
+Leaving market...
+=================== WORLD MAP ===================
+
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  X  |  _  |  _  |  _  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  _  |  M  |  P  |  _  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  _  |  M  |  _  |  _  |  _  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  X  |  M  |  _  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  X  |  _  |  X  |  M  |  M  |  M  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  M  |  M  |  M  |  _  |  _  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  _  |  _  |  _  |  M  |  _  |  X  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  _  |  _  |  _  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+Enter a choice:
+Move [w -> up | a -> left | s -> down | d -> right]: 
+Enter Market [M]: 
+Show inventory [I]: 
+Show player stats [P]: 
+Quit [Q]: 
+Your choice: w
+BATTLE STARTS!
+
+===== HEROES =====
+Amaryllis Astra - HP: 100.00/100.00, MP: 500.00/500.00, Level: 1, Gold: 2300, EXP: 5
+
+===== MONSTERS =====
+Blinky - HP: 100.00, Level: 1, Damage: 450.00, Defense: 350.00, Dodge: 35.00
+
+Amaryllis Astras turn
+Choose an action:
+1 - Attack
+2 - Cast Spell
+3 - Use Potion
+4 - Equip Weapon/Armor
+5 - Skip
+Your choice: 1
+Choose a monster to target:
+[0] Blinky (HP: 100.00)
+Your choice: 0
+Amaryllis Astra dealt 47.50 damage to Blinky.
+Amaryllis Astra dodged the attack!
+
+===== HEROES =====
+Amaryllis Astra - HP: 100.00/100.00, MP: 500.00/500.00, Level: 1, Gold: 2300, EXP: 5
+
+===== MONSTERS =====
+Blinky - HP: 62.50, Level: 1, Damage: 450.00, Defense: 350.00, Dodge: 35.00
+
+Amaryllis Astras turn
+Choose an action:
+1 - Attack
+2 - Cast Spell
+3 - Use Potion
+4 - Equip Weapon/Armor
+5 - Skip
+Your choice: 1
+Choose a monster to target:
+[0] Blinky (HP: 62.50)
+Your choice: 0
+Amaryllis Astra dealt 47.50 damage to Blinky.
+Amaryllis Astra dodged the attack!
+
+===== HEROES =====
+Amaryllis Astra - HP: 100.00/100.00, MP: 500.00/500.00, Level: 1, Gold: 2300, EXP: 5
+
+===== MONSTERS =====
+Blinky - HP: 25.00, Level: 1, Damage: 450.00, Defense: 350.00, Dodge: 35.00
+
+Amaryllis Astras turn
+Choose an action:
+1 - Attack
+2 - Cast Spell
+3 - Use Potion
+4 - Equip Weapon/Armor
+5 - Skip
+Your choice: 1
+Choose a monster to target:
+[0] Blinky (HP: 25.00)
+Your choice: 0
+Amaryllis Astra dealt 47.50 damage to Blinky.
+All monsters have been defeated. You win!
+=================== WORLD MAP ===================
+
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  X  |  _  |  P  |  _  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  _  |  M  |  M  |  _  |  _  |  M  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  _  |  M  |  _  |  _  |  _  |  _  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  X  |  M  |  _  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  M  |  X  |  _  |  X  |  M  |  M  |  M  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  _  |  M  |  M  |  M  |  _  |  _  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  X  |  _  |  _  |  _  |  M  |  _  |  X  |  X  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+|  _  |  M  |  _  |  _  |  _  |  M  |  _  |  M  |
++=====+=====+=====+=====+=====+=====+=====+=====+
+Enter a choice:
+Move [w -> up | a -> left | s -> down | d -> right]: 
+Show inventory [I]: 
+Show player stats [P]: 
+Quit [Q]: 
+Your choice: q
+Game Exited!!
+```
     

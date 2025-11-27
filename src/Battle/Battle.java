@@ -704,7 +704,7 @@ public class Battle {
             return;
         }
 
-        double damage = monster.getBaseDamageValue();
+        double damage = (monster.getBaseDamageValue() * 0.05);
         Armor armor = hero.getEquippedArmor();
         if (armor != null) {
             damage -= armor.getDamageReductionValue();

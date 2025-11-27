@@ -78,6 +78,7 @@ public class Game {
         System.out.println("\n========= HERO CONFIGURATIONS =========");
         System.out.print("Select the number of heroes in your party: ");
         int heroCount = sc.nextInt();
+        sc.nextLine(); // consume the leftover newline
 
         ArrayList<Hero> heroes = new ArrayList<>();
 
@@ -350,6 +351,11 @@ public class Game {
                     break;
             }
 
+            if (areAllHeroesDead(player.getHeroes())) {
+                System.out.println("All heroes have died. Game Over.");
+                System.exit(0);
+            }
+
             if (quitGame) {
                 System.out.println("Game Exited!!");
                 break;
@@ -409,5 +415,13 @@ public class Game {
         return true;
     }
 
+    private boolean areAllHeroesDead(ArrayList<Hero> heroes) {
+        for (Hero hero : heroes) {
+            if (hero.getHP() > 0) {
+                return false;
+            }
+        }
 
+        return true;
+    }
 }
