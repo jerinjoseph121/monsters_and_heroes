@@ -6,7 +6,7 @@ public enum AttributeType {
     STRENGTH(2),
     AGILITY(3),
     DEXTERITY(4),
-    DEFENCE(5);
+    DEFENSE(5);
 
     private final int typeId;
 

@@ -14,6 +14,7 @@ public enum ArmorCatalog {
     private final int cost;
     private final int level;
     private final int damageReduced;
+    public static final int count = 5;
 
     ArmorCatalog(int typeId, String name, int cost, int level, int damageReduced) {
         this.typeId = typeId;

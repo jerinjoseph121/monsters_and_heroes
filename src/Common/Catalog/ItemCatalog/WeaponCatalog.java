@@ -16,6 +16,7 @@ public enum WeaponCatalog {
     private final int level;
     private final int damage;
     private final int requiredHands;
+    public static final int count = 6;
 
     WeaponCatalog(int typeId, String name, int cost, int level, int damage, int requiredHands) {
         this.typeId = typeId;

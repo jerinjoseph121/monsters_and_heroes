@@ -3,6 +3,7 @@ package Map;
 import Common.utils.Colors;
 import Common.utils.Position;
 import Common.utils.MapTileType;
+import Market.Market;
 
 import java.util.*;
 
@@ -88,16 +89,16 @@ public class Map {
                 Position position = new Position(i, j);
                 if (tileTypeMatrix[i][j] != MapTileType.INACCESSIBLE.getTypeId()) {
                     if (rand.nextDouble() < marketProbability) {
-                        MapTile mapTile = new MapTile(MapTileType.MARKET, position);
+                        MapTile mapTile = new MapTile(MapTileType.MARKET, position, new Market());
                         mapMatrix[i][j] = mapTile;
                     }
                     else {
-                        MapTile mapTile = new MapTile(MapTileType.COMMON, position);
+                        MapTile mapTile = new MapTile(MapTileType.COMMON, position, null);
                         mapMatrix[i][j] = mapTile;
                     }
                 }
                 else {
-                    MapTile mapTile = new MapTile(MapTileType.INACCESSIBLE, position);
+                    MapTile mapTile = new MapTile(MapTileType.INACCESSIBLE, position, null);
                     mapMatrix[i][j] = mapTile;
                 }
             }
@@ -241,4 +242,10 @@ public class Map {
 
         return mapMatrix[playerRow][playerCol].getType();
     }
+
+    public Market getMarketAt(Position currentPosition) {
+        MapTile mapTile = mapMatrix[currentPosition.getRow()][currentPosition.getCol()];
+        return mapTile.getMarket();
+    }
+
 }

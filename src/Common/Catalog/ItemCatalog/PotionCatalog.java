@@ -20,7 +20,7 @@ public enum PotionCatalog {
             Arrays.asList(AttributeType.HEALTH, AttributeType.MANA, AttributeType.STRENGTH, AttributeType.AGILITY)),
     AMBROSIA(5, "Ambrosia", 1000, 8, 150,
             Arrays.asList(AttributeType.HEALTH, AttributeType.MANA, AttributeType.STRENGTH, AttributeType.DEXTERITY,
-                    AttributeType.DEFENCE, AttributeType.AGILITY));
+                    AttributeType.DEFENSE, AttributeType.AGILITY));
 
 
     private final int typeId;
@@ -29,6 +29,7 @@ public enum PotionCatalog {
     private final int level;
     private final int attributeIncrease;
     private final List<AttributeType> attributes;
+    public static final int count = 6;
 
 
     PotionCatalog(int typeId, String name, int cost, int level, int attributeIncrease, List<AttributeType> attributes) {

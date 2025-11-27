@@ -4,12 +4,14 @@ import Battle.Battle;
 import Common.Catalog.HeroCatalog.PaladinCatalog;
 import Common.Catalog.HeroCatalog.SorcererCatalog;
 import Common.Catalog.HeroCatalog.WarriorCatalog;
+import Common.utils.Helper;
 import Common.utils.MapTileType;
 import Common.utils.Position;
 import Hero.Hero;
 import Hero.HeroType;
 import Player.Player;
 import Map.Map;
+import Market.Market;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -28,113 +30,50 @@ public class Game {
         launchGame();
     }
 
+    // Start of game, is called directly from main
     public void launchGame() {
         System.out.println("WELCOME TO MONSTERS AND HEROES");
 
         System.out.print("\nEnter your name: ");
-        sc.nextLine(); // <-- clear leftover newline if needed
         String playerName = sc.nextLine().trim();
-
         if (playerName.isEmpty()) {
             playerName = "Player";   // default name
         }
 
         System.out.println("\n========= MAP CONFIGURATIONS =========");
         System.out.println("Enter the dimensions of the world map.");
-        int totalRows;
-        while (true) {
-            System.out.print("Rows: ");
-            if (sc.hasNextInt()) {
-                totalRows = sc.nextInt();
-                if (totalRows > 0) break;
-                System.out.println("Invalid input. Rows must be a positive number.");
-            } else {
-                System.out.println("Invalid input. Please enter a number.");
-                sc.next(); // clear invalid token
-            }
-        }
 
-        int totalColumns;
-        while (true) {
-            System.out.print("Columns: ");
-            if (sc.hasNextInt()) {
-                totalColumns = sc.nextInt();
-                if (totalColumns > 0) break;
-                System.out.println("Invalid input. Columns must be a positive number.");
-            } else {
-                System.out.println("Invalid input. Please enter a number.");
-                sc.next(); // clear invalid token
-            }
-        }
+        int totalRows = Helper.readIntInRange(sc, "Rows: ", 1, 1000);
+        int totalColumns = Helper.readIntInRange(sc, "Columns: ", 1, 1000);
 
         System.out.println("\nNow enter certain configurations for different features in the map");
+
         // ===== BATTLE PROBABILITY =====
-        while (true) {
-            System.out.print("Probability [0-1] [Default 0.4]: ");
-            sc.nextLine(); // Clear leftover newline from previous input if needed
-            String input = sc.nextLine().trim();
+        battleProb = Helper.readDoubleInRangeWithDefault(
+                sc,
+                "Battle Probability [0-1] [Default 0.4]: ",
+                0.0,
+                1.0,
+                0.4
+        );
 
-            if (input.isEmpty()) {
-                battleProb = 0.4;  // default
-                break;
-            }
-
-            try {
-                battleProb = Double.parseDouble(input);
-                if (battleProb >= 0 && battleProb <= 1) {
-                    break;  // valid
-                }
-                System.out.println("Invalid value! Enter a number between 0 and 1.");
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input! Please enter a numeric value.");
-            }
-        }
-
-        // ===== BLOCK PROBABILITY =====
-        double blockProb;
-        while (true) {
-            System.out.print("Block Probability [0-1] [Default 0.2]: ");
-            sc.nextLine(); // Clear leftover newline from previous input if needed
-            String input = sc.nextLine().trim();
-
-            if (input.isEmpty()) {
-                blockProb = 0.2;   // default
-                break;
-            }
-
-            try {
-                blockProb = Double.parseDouble(input);
-                if (blockProb >= 0 && blockProb <= 1) {
-                    break;  // valid
-                }
-                System.out.println("Invalid value! Enter a number between 0 and 1.");
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input! Please enter a numeric value.");
-            }
-        }
+        // ===== BLOCK (INACCESSIBLE) PROBABILITY =====
+        double blockProb = Helper.readDoubleInRangeWithDefault(
+                sc,
+                "Inaccessible Tile Probability [0-1] [Default 0.2]: ",
+                0.0,
+                1.0,
+                0.2
+        );
 
         // ===== MARKET PROBABILITY =====
-        double marketProb;
-        while (true) {
-            System.out.print("Market Probability [0-1] [Default 0.3]: ");
-            sc.nextLine(); // Clear leftover newline from previous input if needed
-            String input = sc.nextLine().trim();
-
-            if (input.isEmpty()) {
-                marketProb = 0.3;  // default
-                break;
-            }
-
-            try {
-                marketProb = Double.parseDouble(input);
-                if (marketProb >= 0 && marketProb <= 1) {
-                    break;  // valid
-                }
-                System.out.println("Invalid value! Enter a number between 0 and 1.");
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input! Please enter a numeric value.");
-            }
-        }
+        double marketProb = Helper.readDoubleInRangeWithDefault(
+                sc,
+                "Market Probability [0-1] [Default 0.3]: ",
+                0.0,
+                1.0,
+                0.3
+        );
 
         System.out.println("\n========= HERO CONFIGURATIONS =========");
         System.out.print("Select the number of heroes in your party: ");
@@ -143,35 +82,20 @@ public class Game {
         ArrayList<Hero> heroes = new ArrayList<>();
 
         for (int i = 0; i < heroCount; i++) {
-            System.out.printf("%n===== HERO %d =====", i);
+            System.out.printf("%n===== HERO %d =====\n", i);
 
             // Input hero type
             System.out.printf("Enter the type of hero %d [Default WARRIOR - 0]: %n", i);
             System.out.println("WARRIOR  - 0");
             System.out.println("SORCERER - 1");
             System.out.println("PALADIN  - 2");
-            int heroTypeId;
-            while (true) {
-                System.out.print("Your choice (0-2): ");
-                sc.nextLine(); // Clear leftover newline from previous input if needed
-                String input = sc.nextLine().trim();
 
-                if (input.isEmpty()) {
-                    heroTypeId = 0; // default WARRIOR
-                    break;
-                }
-
-                try {
-                    heroTypeId = Integer.parseInt(input);
-                    if (heroTypeId >= 0 && heroTypeId <= 2) {
-                        break;
-                    }
-                    System.out.println("Invalid input! Please enter a number between 0 and 2.");
-                }
-                catch (NumberFormatException ex) {
-                    System.out.println("Invalid input! Please enter a valid number.");
-                }
-            }
+            int heroTypeId = Helper.readIntInRangeWithDefault(sc,
+                    "Your choice (0-2): ",
+                    0,
+                    2,
+                    0
+            );
             HeroType heroType = HeroType.fromTypeId(heroTypeId);
 
             Hero hero = null;
@@ -411,16 +335,19 @@ public class Game {
                     validMove = movePlayer(newPosition);
                     break;
                 case "I":
-                    System.out.println("Inventory Showed!!");
+                    for (Hero hero : player.getHeroes()) {
+                        Helper.showHeroInventory(hero);
+                    }
                     break;
                 case "P":
-                    System.out.println("Player Stats Showed!!");
+                    Helper.showPlayerStats(player);
                     break;
                 case "Q":
                     quitGame = true;
                     break;
                 case "M":
-                    System.out.println("Market Entered!!");
+                    enterMarket();
+                    break;
             }
 
             if (quitGame) {
@@ -434,6 +361,21 @@ public class Game {
         }
     }
 
+    // Called when player presses M and is standing on a market tile
+    private void enterMarket() {
+        // You need some way to get the Market object at the player's current position.
+        // Adjust this line to match whatever API your Map class exposes.
+        Market currentMarket = map.getMarketAt(player.getCurrentPosition());
+
+        if (currentMarket == null) {
+            System.out.println("No market at this location.");
+            return;
+        }
+
+        currentMarket.openMarket(sc, player.getHeroes());
+    }
+
+    // Logic to move a player. It runs the battle command if player triggers a battle
     private boolean movePlayer(Position updatedPlayerPosition) {
         if (!map.updatePlayerCurrentPosition(updatedPlayerPosition)) {
             System.out.println("Invalid movement. Please enter a valid movement.\n");
@@ -447,9 +389,22 @@ public class Game {
             if(Battle.isBattleTriggered(battleProb)) {
                 Battle battle = new Battle(player.getHeroes());
                 boolean isPlayerWin = battle.arenaFight();
+                if (isPlayerWin) {
+                    int maxHeroLevel = 0;
+                    int totalHeroLevel = 0;
+                    for (Hero hero : player.getHeroes()) {
+                        maxHeroLevel = Math.max(maxHeroLevel, hero.getLevel());
+                        totalHeroLevel += hero.getLevel();
+                    }
+                    player.setHeroMaxLevel(maxHeroLevel);
+                    player.setTotalHeroLevel(totalHeroLevel);
+                }
+                else {
+                    System.out.println("GAME OVER!!");
+                    return false;
+                }
             };
         }
-
 
         return true;
     }

@@ -33,4 +33,28 @@ public class Player {
     public ArrayList<Hero> getHeroes() {
         return heroes;
     }
+
+    public String getPlayerName() {
+        return name;
+    }
+
+    public int getHeroCount() {
+        return heroCount;
+    }
+
+    public int getHeroMaxLevel() {
+        return heroMaxLevel;
+    }
+
+    public void setHeroMaxLevel(int heroMaxLevel) {
+        this.heroMaxLevel = heroMaxLevel;
+    }
+
+    public int getTotalHeroLevel() {
+        return totalHeroLevel;
+    }
+
+    public void setTotalHeroLevel(int totalHeroLevel) {
+        this.totalHeroLevel = totalHeroLevel;
+    }
 }

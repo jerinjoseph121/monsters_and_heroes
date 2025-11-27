@@ -16,6 +16,7 @@ public enum FireSpellCatalog {
     private final int requiredLevel;
     private final int damage;
     private final int manaCost;
+    public static final int count = 5;
 
     FireSpellCatalog(int typeId, String name, int cost, int requiredLevel, int damage, int manaCost) {
         this.typeId = typeId;
